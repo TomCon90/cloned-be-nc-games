@@ -115,8 +115,6 @@ const seed = (data) => {
       );
       return db.query(queryStr);
     });
-
-  // 2. insert data
 };
 
 module.exports = seed;
