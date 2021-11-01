@@ -1,7 +1,7 @@
 const express = require("express");
 const apiRouter = require("./routes/app.router");
 const app = express();
-const { handle500 } = require("./errors/errors.controller");
+const { handle500, handleCustomErrors } = require("./errors/errors.controller");
 
 app.use(express.json());
 
@@ -11,6 +11,7 @@ app.all("/*", (req, res) => {
   res.status(404).send({ msg: "URL not found" });
 });
 
+app.use(handleCustomErrors);
 app.use(handle500);
 
 module.exports = app;
