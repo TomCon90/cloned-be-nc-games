@@ -9,7 +9,7 @@ afterAll(() => db.end());
 
 describe("testing app():", () => {
   describe("/api/categories", () => {
-    describe.only("GET", () => {
+    describe("GET", () => {
       test("status 200: returns all categories", () => {
         return request(app)
           .get("/api/categories")
@@ -24,6 +24,16 @@ describe("testing app():", () => {
             categories.forEach((category) => {
               expect(category).toEqual(testCategory);
             });
+          });
+      });
+    });
+    describe("Errors", () => {
+      test.only("status 404: responds with message that URL not found", () => {
+        return request(app)
+          .get("/api/notaroute")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("URL not found");
           });
       });
     });
