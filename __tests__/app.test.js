@@ -31,7 +31,7 @@ describe("testing app():", () => {
   describe("HAPPY PATH /api/reviews", () => {
     describe("GET", () => {
       describe("GET reviews", () => {
-        test.only("status 200: returns the reviews for the given id", () => {
+        test("status 200: returns the reviews for the given id", () => {
           return request(app)
             .get("/api/reviews/2")
             .expect(200)
@@ -53,7 +53,7 @@ describe("testing app():", () => {
               expect(review.review.comment_count).toEqual(3);
             });
         });
-        test.only("status 200: returns all reviews", () => {
+        test("status 200: returns all reviews", () => {
           return request(app)
             .get("/api/reviews")
             .expect(200)
@@ -137,7 +137,25 @@ describe("testing app():", () => {
             });
         });
       });
-      describe("GET comments", () => {});
+      describe("GET comments", () => {
+        test.only("status 200: returns all comments for the relevant review_id", () => {
+          return request(app)
+            .get("/api/reviews/2/comments")
+            .expect(200)
+            .then(({ body }) => {
+              const { comments } = body;
+              const testComments = {
+                comment_id: expect.any(Number),
+                author: expect.any(String),
+                votes: expect.any(String),
+                created_at: expect.any(String),
+                body: expect.any(String),
+              };
+              expect(comments.length).toBe(3);
+              expect(comments[0].author).toEqual("bainesface");
+            });
+        });
+      });
     });
     describe("PATCH", () => {
       test("Status 200: responds with the updated review", () => {

@@ -2,6 +2,7 @@ const {
   selectAllReviewsByID,
   patchReviewsByID,
   selectAllReviews,
+  selectAllCommentsByReviewID,
 } = require("../models/reviews.models");
 
 exports.getAllReviewsByID = (req, res, next) => {
@@ -28,6 +29,16 @@ exports.getAllReviews = (req, res, next) => {
   selectAllReviews(sort_by, order, category)
     .then((reviews) => {
       res.status(200).send({ reviews });
+    })
+    .catch(next);
+};
+
+exports.getCommentsByReviewID = (req, res, next) => {
+  const { review_id } = req.params;
+  selectAllCommentsByReviewID(review_id)
+    .then((comments) => {
+      console.log(comments);
+      res.status(200).send({ comments });
     })
     .catch(next);
 };
