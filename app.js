@@ -11,12 +11,13 @@ app.use(express.json());
 
 app.use("/api", apiRouter);
 
+app.use(handlePSQLErrors);
+app.use(handleCustomErrors);
+
 app.all("/*", (req, res) => {
   res.status(404).send({ msg: "URL not found" });
 });
 
-app.use(handlePSQLErrors);
-app.use(handleCustomErrors);
 app.use(handle500);
 
 module.exports = app;

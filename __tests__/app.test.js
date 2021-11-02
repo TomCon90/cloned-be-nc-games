@@ -64,7 +64,7 @@ describe("testing app():", () => {
           expect(body.msg).toBe("URL not found");
         });
     });
-    test.only("status: 400, responds with an error message when passed a bad ID", () => {
+    test("status: 400, responds with an error message when passed a bad ID", () => {
       return request(app)
         .get("/api/reviews/notAnId")
         .expect(400)
@@ -72,9 +72,9 @@ describe("testing app():", () => {
           expect(body.msg).toBe("Invalid query");
         });
     });
-    test("status: 404, responds with an error message when passed an ID that doesnt exist", () => {
+    test("status: 404, responds with an error message when passed an ID that doesn't exist", () => {
       return request(app)
-        .delete("/api/reviews/999")
+        .get("/api/reviews/999")
         .expect(404)
         .then(({ body }) => {
           expect(body.msg).toBe("ID does not exist");
