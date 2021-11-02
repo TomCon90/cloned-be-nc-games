@@ -36,7 +36,6 @@ describe("testing app():", () => {
           .expect(200)
           .then(({ body }) => {
             const review = body;
-            console.log(review);
             const testReviews = {
               review_id: expect.any(Number),
               owner: expect.any(String),
@@ -51,6 +50,30 @@ describe("testing app():", () => {
             };
             expect(review.review.title).toBe("Jenga");
             expect(review.review.comment_count).toEqual("3");
+          });
+      });
+      test("status 200: returns all reviews", () => {
+        return request(app)
+          .get("/api/reviews")
+          .expect(200)
+          .then(({ body }) => {
+            const { reviews } = body;
+            const testReview = {
+              review_id: expect.any(Number),
+              owner: expect.any(String),
+              title: expect.any(String),
+              review_body: expect.any(String),
+              designer: expect.any(String),
+              review_img_url: expect.any(String),
+              category: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              comment_count: expect.any(String),
+            };
+            expect(reviews.length).toBe(13);
+            reviews.forEach((review) => {
+              expect(review).toEqual(testReview);
+            });
           });
       });
     });
@@ -99,6 +122,7 @@ describe("testing app():", () => {
       });
     });
   });
+
   describe("Errors", () => {
     test("status 404: responds with message that URL not found", () => {
       return request(app)
