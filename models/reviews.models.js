@@ -23,12 +23,6 @@ exports.selectAllReviewsByID = (review_id) => {
 };
 
 exports.patchReviewsByID = (review_id, inc_votes) => {
-  // if (parseInt(review_id) === NaN) {
-  //   return Promise.reject({
-  //     status: 400,
-  //     msg: "Invalid query",
-  //   });
-  // } else {
   return db
     .query(
       "UPDATE reviews SET votes = votes + $1 WHERE review_id = $2 RETURNING *;",
@@ -51,7 +45,6 @@ exports.patchReviewsByID = (review_id, inc_votes) => {
       }
     });
 };
-// };
 
 exports.selectAllReviews = (sort_by, order, category) => {
   if (!sort_by) {
@@ -98,6 +91,17 @@ exports.selectAllReviews = (sort_by, order, category) => {
 
 exports.selectAllCommentsByReviewID = (review_id) => {
   return db
-    .query(`SELECT * FROM comments WHERE review_id = $1`, [review_id])
-    .then(({ rows }) => rows);
+    .query(`SELECT * FROM reviews WHERE review_id = $1`, [review_id])
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: "ID does not exist",
+        });
+      } else {
+        return db
+          .query(`SELECT * FROM comments WHERE review_id = $1`, [review_id])
+          .then(({ rows }) => rows);
+      }
+    });
 };
