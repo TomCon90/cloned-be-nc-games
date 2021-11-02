@@ -58,12 +58,24 @@ exports.patchReviewsByID = (review_id, inc_votes) => {
   }
 };
 
-exports.selectAllReviews = () => {
-  return db
-    .query(
-      "SELECT * , (SELECT COUNT(*) FROM comments) AS comment_count FROM reviews;"
-    )
-    .then(({ rows }) => {
-      return rows;
-    });
+exports.selectAllReviews = (sort_by, order, category) => {
+  if (!sort_by) {
+    sort_by = "created_at";
+  }
+  if (!order) {
+    order = "ASC";
+  }
+  const queryParams = [];
+  let queryStr = `SELECT * , (SELECT COUNT(*) FROM comments) AS comment_count FROM reviews`;
+  if (category) {
+    queryStr += ` WHERE category = $1`;
+    queryParams.push(category);
+  }
+  queryStr += ` ORDER BY ${sort_by} ${order};`;
+  console.log(queryStr);
+  console.log(queryParams);
+  return db.query(queryStr, queryParams).then(({ rows }) => {
+    console.log(rows);
+    return rows;
+  });
 };

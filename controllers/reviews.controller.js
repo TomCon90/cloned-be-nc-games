@@ -28,7 +28,8 @@ exports.updateReviewsByID = (req, res, next) => {
 };
 
 exports.getAllReviews = (req, res, next) => {
-  selectAllReviews()
+  const { sort_by, order, category } = req.query;
+  selectAllReviews(sort_by, order, category)
     .then((reviews) => {
       res.status(200).send({ reviews });
     })
