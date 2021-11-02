@@ -138,7 +138,7 @@ describe("testing app():", () => {
         });
       });
       describe("GET comments", () => {
-        test.only("status 200: returns all comments for the relevant review_id", () => {
+        test("status 200: returns all comments for the relevant review_id", () => {
           return request(app)
             .get("/api/reviews/2/comments")
             .expect(200)
@@ -224,6 +224,22 @@ describe("testing app():", () => {
       test("status: 404, GET api/reviews/999 responds with an error message when passed an ID that doesn't exist", () => {
         return request(app)
           .get("/api/reviews/999")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("ID does not exist");
+          });
+      });
+      test("status: 400, GET api/reviews/notanId/comments responds with an error message when passed a bad ID", () => {
+        return request(app)
+          .get("/api/reviews/notAnId/comments")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Invalid query");
+          });
+      });
+      test("status: 404, GET api/reviews/999/comments responds with an error message when passed an ID that doesn't exist", () => {
+        return request(app)
+          .get("/api/reviews/999/comments")
           .expect(404)
           .then(({ body }) => {
             expect(body.msg).toBe("ID does not exist");
