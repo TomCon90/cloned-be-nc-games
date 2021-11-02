@@ -55,9 +55,8 @@ describe("testing app():", () => {
       });
     });
     describe("PATCH", () => {
-      test.only("Status 200: responds with the updated review", () => {
+      test("Status 200: responds with the updated review", () => {
         const update = { inc_votes: 10 };
-        const minusUpdate = { inc_votes: -5 };
         return request(app)
           .patch("/api/reviews/2")
           .send(update)
@@ -74,6 +73,27 @@ describe("testing app():", () => {
               category: "dexterity",
               created_at: "2021-01-18T10:01:41.251Z",
               votes: 15,
+            });
+          });
+      });
+      test("Status 200: responds with the updated review", () => {
+        const minusUpdate = { inc_votes: -5 };
+        return request(app)
+          .patch("/api/reviews/2")
+          .send(minusUpdate)
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.review).toEqual({
+              review_id: 2,
+              owner: "philippaclaire9",
+              title: "Jenga",
+              review_body: "Fiddly fun for all the family",
+              designer: "Leslie Scott",
+              review_img_url:
+                "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+              category: "dexterity",
+              created_at: "2021-01-18T10:01:41.251Z",
+              votes: 0,
             });
           });
       });
@@ -102,6 +122,32 @@ describe("testing app():", () => {
         .expect(404)
         .then(({ body }) => {
           expect(body.msg).toBe("ID does not exist");
+        });
+    });
+    test("status: 400, responds with an error message when passed a bad ID", () => {
+      return request(app)
+        .patch("/api/reviews/notAnId")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid query");
+        });
+    });
+    test("status: 404, responds with an error message when passed an ID that doesn't exist", () => {
+      return request(app)
+        .patch("/api/reviews/999")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("ID does not exist");
+        });
+    });
+    test("status: 400, responds with an error message when user makes a bad request", () => {
+      const badIncVote = {};
+      return request(app)
+        .patch("/api/reviews/2")
+        .send(badIncVote)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toEqual("Empty object");
         });
     });
   });

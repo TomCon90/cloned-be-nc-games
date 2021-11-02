@@ -19,8 +19,11 @@ exports.updateReviewsByID = (req, res, next) => {
   const { inc_votes } = req.body;
 
   console.log("inside update reviews by ID");
-  patchReviewsByID(id, inc_votes).then((review) => {
-    console.log(review);
-    res.status(200).send({ review });
-  });
+  patchReviewsByID(id, inc_votes)
+    .then((review) => {
+      res.status(200).send({ review });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
