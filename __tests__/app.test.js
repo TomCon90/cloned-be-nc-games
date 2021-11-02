@@ -30,12 +30,13 @@ describe("testing app():", () => {
   });
   describe("/api/reviews", () => {
     describe("GET", () => {
-      test.only("status 200: returns the reviews for the given id", () => {
+      test("status 200: returns the reviews for the given id", () => {
         return request(app)
-          .get("api/reviews/1")
+          .get("/api/reviews/2")
           .expect(200)
           .then(({ body }) => {
             const review = body;
+            console.log(review);
             const testReviews = {
               review_id: expect.any(Number),
               owner: expect.any(String),
@@ -48,8 +49,8 @@ describe("testing app():", () => {
               votes: expect.any(Number),
               comment_count: expect.any(Number),
             };
-            expect(review.length).toBe(10);
-            expect(review.comment_count).toBe(3);
+            expect(review.review.title).toBe("Jenga");
+            expect(review.review.comment_count).toEqual("3");
           });
       });
     });
@@ -63,12 +64,12 @@ describe("testing app():", () => {
           expect(body.msg).toBe("URL not found");
         });
     });
-    test("status: 400, responds with an error message when passed a bad ID", () => {
+    test.only("status: 400, responds with an error message when passed a bad ID", () => {
       return request(app)
         .get("/api/reviews/notAnId")
         .expect(400)
         .then(({ body }) => {
-          expect(body.msg).toBe("Wrong data type");
+          expect(body.msg).toBe("Invalid query");
         });
     });
     test("status: 404, responds with an error message when passed an ID that doesnt exist", () => {

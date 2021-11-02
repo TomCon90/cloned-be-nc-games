@@ -9,3 +9,13 @@ exports.handleCustomErrors = (err, req, res, next) => {
     next(err);
   }
 };
+
+exports.handlePSQLErrors = (err, req, res, next) => {
+  if (err.code === "23502") {
+    res.status(400).send({ msg: "Empty object" });
+  } else if (err.code === "22P02") {
+    res.status(400).send({ msg: "Wrong data type" });
+  } else {
+    next(err);
+  }
+};
