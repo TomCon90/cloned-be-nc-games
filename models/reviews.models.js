@@ -1,5 +1,6 @@
 const { query } = require("../db");
 const db = require("../db");
+const { commentCountToNumber } = require("../utils/utils");
 
 exports.selectAllReviewsByID = (review_id) => {
   if (parseInt(review_id) === NaN) {
@@ -14,6 +15,7 @@ exports.selectAllReviewsByID = (review_id) => {
         [review_id, review_id]
       )
       .then(({ rows }) => {
+        commentCountToNumber(rows);
         const review = rows[0];
         if (review === undefined) {
           return Promise.reject({
@@ -95,6 +97,7 @@ exports.selectAllReviews = (sort_by, order, category) => {
     }
     queryStr += ` ORDER BY ${sort_by} ${order};`;
     return db.query(queryStr, queryParams).then(({ rows }) => {
+      commentCountToNumber(rows);
       return rows;
     });
   }

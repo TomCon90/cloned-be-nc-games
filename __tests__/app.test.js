@@ -31,7 +31,7 @@ describe("testing app():", () => {
   describe("HAPPY PATH /api/reviews", () => {
     describe("GET", () => {
       describe("GET reviews", () => {
-        test("status 200: returns the reviews for the given id", () => {
+        test.only("status 200: returns the reviews for the given id", () => {
           return request(app)
             .get("/api/reviews/2")
             .expect(200)
@@ -50,10 +50,10 @@ describe("testing app():", () => {
                 comment_count: expect.any(Number),
               };
               expect(review.review.title).toBe("Jenga");
-              expect(review.review.comment_count).toEqual("3");
+              expect(review.review.comment_count).toEqual(3);
             });
         });
-        test("status 200: returns all reviews", () => {
+        test.only("status 200: returns all reviews", () => {
           return request(app)
             .get("/api/reviews")
             .expect(200)
@@ -69,7 +69,7 @@ describe("testing app():", () => {
                 category: expect.any(String),
                 created_at: expect.any(String),
                 votes: expect.any(Number),
-                comment_count: expect.any(String),
+                comment_count: expect.any(Number),
               };
               expect(reviews.length).toBe(13);
               reviews.forEach((review) => {
