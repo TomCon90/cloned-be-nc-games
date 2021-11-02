@@ -28,3 +28,16 @@ exports.selectAllReviewsByID = (id) => {
       });
   }
 };
+
+exports.patchReviewsByID = (id, inc_votes) => {
+  console.log("inside patch reviews");
+  return db
+    .query(
+      "UPDATE reviews SET votes = votes + $1 WHERE review_id = $2 RETURNING *;",
+      [inc_votes, id]
+    )
+    .then(({ rows }) => {
+      console.log(rows);
+      return rows[0];
+    });
+};
