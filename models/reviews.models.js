@@ -65,17 +65,37 @@ exports.selectAllReviews = (sort_by, order, category) => {
   if (!order) {
     order = "ASC";
   }
-  const queryParams = [];
-  let queryStr = `SELECT * , (SELECT COUNT(*) FROM comments) AS comment_count FROM reviews`;
-  if (category) {
-    queryStr += ` WHERE category = $1`;
-    queryParams.push(category);
+  if (
+    ![
+      "owner",
+      "title",
+      "review_id",
+      "category",
+      "review_img_url",
+      "created_at",
+      "votes",
+      "comment_count",
+    ].includes(sort_by.toLowerCase())
+  ) {
+    return Promise.reject({
+      status: 400,
+      msg: "Bad Request: cannot sort with given parameter",
+    });
+  } else if (!["asc", "desc"].includes(order.toLowerCase())) {
+    return Promise.reject({
+      status: 400,
+      msg: "Bad Request: Sort order invalid",
+    });
+  } else {
+    const queryParams = [];
+    let queryStr = `SELECT * , (SELECT COUNT(*) FROM comments) AS comment_count FROM reviews`;
+    if (category) {
+      queryStr += ` WHERE category = $1`;
+      queryParams.push(category);
+    }
+    queryStr += ` ORDER BY ${sort_by} ${order};`;
+    return db.query(queryStr, queryParams).then(({ rows }) => {
+      return rows;
+    });
   }
-  queryStr += ` ORDER BY ${sort_by} ${order};`;
-  console.log(queryStr);
-  console.log(queryParams);
-  return db.query(queryStr, queryParams).then(({ rows }) => {
-    console.log(rows);
-    return rows;
-  });
 };

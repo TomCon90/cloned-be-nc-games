@@ -8,7 +8,7 @@ beforeEach(() => seed(testData));
 afterAll(() => db.end());
 
 describe("testing app():", () => {
-  describe("/api/categories", () => {
+  describe("HAPPY PATH /api/categories", () => {
     describe("GET", () => {
       test("status 200: returns all categories", () => {
         return request(app)
@@ -28,113 +28,116 @@ describe("testing app():", () => {
       });
     });
   });
-  describe("/api/reviews", () => {
+  describe("HAPPY PATH /api/reviews", () => {
     describe("GET", () => {
-      test("status 200: returns the reviews for the given id", () => {
-        return request(app)
-          .get("/api/reviews/2")
-          .expect(200)
-          .then(({ body }) => {
-            const review = body;
-            const testReviews = {
-              review_id: expect.any(Number),
-              owner: expect.any(String),
-              title: expect.any(String),
-              review_body: expect.any(String),
-              designer: expect.any(String),
-              review_img_url: expect.any(String),
-              category: expect.any(String),
-              created_at: expect.any(Date),
-              votes: expect.any(Number),
-              comment_count: expect.any(Number),
-            };
-            expect(review.review.title).toBe("Jenga");
-            expect(review.review.comment_count).toEqual("3");
-          });
-      });
-      test("status 200: returns all reviews", () => {
-        return request(app)
-          .get("/api/reviews")
-          .expect(200)
-          .then(({ body }) => {
-            const { reviews } = body;
-            const testReview = {
-              review_id: expect.any(Number),
-              owner: expect.any(String),
-              title: expect.any(String),
-              review_body: expect.any(String),
-              designer: expect.any(String),
-              review_img_url: expect.any(String),
-              category: expect.any(String),
-              created_at: expect.any(String),
-              votes: expect.any(Number),
-              comment_count: expect.any(String),
-            };
-            expect(reviews.length).toBe(13);
-            reviews.forEach((review) => {
-              expect(review).toEqual(testReview);
+      describe("GET reviews", () => {
+        test("status 200: returns the reviews for the given id", () => {
+          return request(app)
+            .get("/api/reviews/2")
+            .expect(200)
+            .then(({ body }) => {
+              const review = body;
+              const testReviews = {
+                review_id: expect.any(Number),
+                owner: expect.any(String),
+                title: expect.any(String),
+                review_body: expect.any(String),
+                designer: expect.any(String),
+                review_img_url: expect.any(String),
+                category: expect.any(String),
+                created_at: expect.any(Date),
+                votes: expect.any(Number),
+                comment_count: expect.any(Number),
+              };
+              expect(review.review.title).toBe("Jenga");
+              expect(review.review.comment_count).toEqual("3");
             });
-          });
-      });
-      test("status 200: returns all reviews sorted by created_at by default", () => {
-        return request(app)
-          .get("/api/reviews")
-          .expect(200)
-          .then(({ body }) => {
-            const { reviews } = body;
-            expect(reviews).toBeSortedBy("created_at");
-          });
-      });
-      test("status 200: returns all reviews sorted by any specified field", () => {
-        return request(app)
-          .get("/api/reviews?sort_by=votes")
-          .expect(200)
-          .then(({ body }) => {
-            const { reviews } = body;
-            expect(reviews).toBeSortedBy("votes");
-          });
-      });
-      test("status 200: returns all reviews sorted by any specified field", () => {
-        return request(app)
-          .get("/api/reviews?sort_by=title")
-          .expect(200)
-          .then(({ body }) => {
-            const { reviews } = body;
-            expect(reviews).toBeSortedBy("title");
-          });
-      });
-      test("status 200: returns all reviews sorted by age in reverse order", () => {
-        return request(app)
-          .get("/api/reviews?order=desc")
-          .expect(200)
-          .then(({ body }) => {
-            const { reviews } = body;
-            expect(reviews).toBeSortedBy("created_at", { descending: true });
-          });
-      });
-      test("status 200: Can take two queries sorting by x and ordering by y", () => {
-        return request(app)
-          .get("/api/reviews?sort_by=votes&order=desc")
-          .expect(200)
-          .then(({ body }) => {
-            const { reviews } = body;
-            expect(reviews).toBeSortedBy("votes", {
-              descending: true,
+        });
+        test("status 200: returns all reviews", () => {
+          return request(app)
+            .get("/api/reviews")
+            .expect(200)
+            .then(({ body }) => {
+              const { reviews } = body;
+              const testReview = {
+                review_id: expect.any(Number),
+                owner: expect.any(String),
+                title: expect.any(String),
+                review_body: expect.any(String),
+                designer: expect.any(String),
+                review_img_url: expect.any(String),
+                category: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                comment_count: expect.any(String),
+              };
+              expect(reviews.length).toBe(13);
+              reviews.forEach((review) => {
+                expect(review).toEqual(testReview);
+              });
             });
-          });
-      });
-      test("status 200: returns all reviews that match a filter query on category", () => {
-        return request(app)
-          .get("/api/reviews?category=dexterity")
-          .expect(200)
-          .then(({ body }) => {
-            const { reviews } = body;
-            reviews.forEach((review) => {
-              expect(review.category).toBe("dexterity");
+        });
+        test("status 200: returns all reviews sorted by created_at by default", () => {
+          return request(app)
+            .get("/api/reviews")
+            .expect(200)
+            .then(({ body }) => {
+              const { reviews } = body;
+              expect(reviews).toBeSortedBy("created_at");
             });
-            expect(reviews.length).toBe(1);
-          });
+        });
+        test("status 200: returns all reviews sorted by any specified field", () => {
+          return request(app)
+            .get("/api/reviews?sort_by=votes")
+            .expect(200)
+            .then(({ body }) => {
+              const { reviews } = body;
+              expect(reviews).toBeSortedBy("votes");
+            });
+        });
+        test("status 200: returns all reviews sorted by any specified field", () => {
+          return request(app)
+            .get("/api/reviews?sort_by=title")
+            .expect(200)
+            .then(({ body }) => {
+              const { reviews } = body;
+              expect(reviews).toBeSortedBy("title");
+            });
+        });
+        test("status 200: returns all reviews sorted by age in reverse order", () => {
+          return request(app)
+            .get("/api/reviews?order=desc")
+            .expect(200)
+            .then(({ body }) => {
+              const { reviews } = body;
+              expect(reviews).toBeSortedBy("created_at", { descending: true });
+            });
+        });
+        test("status 200: Can take two queries sorting by x and ordering by y", () => {
+          return request(app)
+            .get("/api/reviews?sort_by=votes&order=desc")
+            .expect(200)
+            .then(({ body }) => {
+              const { reviews } = body;
+              expect(reviews).toBeSortedBy("votes", {
+                descending: true,
+              });
+            });
+        });
+        test("status 200: returns all reviews that match a filter query on category", () => {
+          return request(app)
+            .get("/api/reviews?category=dexterity")
+            .expect(200)
+            .then(({ body }) => {
+              const { reviews } = body;
+              reviews.forEach((review) => {
+                expect(review.category).toBe("dexterity");
+              });
+              expect(reviews.length).toBe(1);
+            });
+        });
       });
+      describe("GET comments", () => {});
     });
     describe("PATCH", () => {
       test("Status 200: responds with the updated review", () => {
@@ -183,55 +186,79 @@ describe("testing app():", () => {
   });
 
   describe("Errors", () => {
-    test("status 404: GET api/notaroute responds with message that URL not found", () => {
-      return request(app)
-        .get("/api/notaroute")
-        .expect(404)
-        .then(({ body }) => {
-          expect(body.msg).toBe("URL not found");
-        });
+    describe("GET requests", () => {
+      test("status 404: GET api/notaroute responds with message that URL not found", () => {
+        return request(app)
+          .get("/api/notaroute")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("URL not found");
+          });
+      });
+      test("status: 400, GET api/reviews/notanId responds with an error message when passed a bad ID", () => {
+        return request(app)
+          .get("/api/reviews/notAnId")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Invalid query");
+          });
+      });
+      test("status: 404, GET api/reviews/999 responds with an error message when passed an ID that doesn't exist", () => {
+        return request(app)
+          .get("/api/reviews/999")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("ID does not exist");
+          });
+      });
     });
-    test("status: 400, GET api/reviews/notanId responds with an error message when passed a bad ID", () => {
-      return request(app)
-        .get("/api/reviews/notAnId")
-        .expect(400)
-        .then(({ body }) => {
-          expect(body.msg).toBe("Invalid query");
-        });
+    describe("PATCH requests", () => {
+      test("status: 400, PATCH api/reviews/notanID responds with an error message when passed a bad ID", () => {
+        return request(app)
+          .patch("/api/reviews/notAnId")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Invalid query");
+          });
+      });
+      test("status: 404, PATCH api/reviews/999 responds with an error message when passed an ID that doesn't exist", () => {
+        return request(app)
+          .patch("/api/reviews/999")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("ID does not exist");
+          });
+      });
+      test("status: 400, PATCH no input values - responds with an error message when user makes a bad request", () => {
+        const badIncVote = {};
+        return request(app)
+          .patch("/api/reviews/2")
+          .send(badIncVote)
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toEqual("Empty object");
+          });
+      });
     });
-    test("status: 404, GET api/reviews/999 responds with an error message when passed an ID that doesn't exist", () => {
-      return request(app)
-        .get("/api/reviews/999")
-        .expect(404)
-        .then(({ body }) => {
-          expect(body.msg).toBe("ID does not exist");
-        });
-    });
-    test("status: 400, PATCH api/reviews/notanID responds with an error message when passed a bad ID", () => {
-      return request(app)
-        .patch("/api/reviews/notAnId")
-        .expect(400)
-        .then(({ body }) => {
-          expect(body.msg).toBe("Invalid query");
-        });
-    });
-    test("status: 404, PATCH api/reviews/999 responds with an error message when passed an ID that doesn't exist", () => {
-      return request(app)
-        .patch("/api/reviews/999")
-        .expect(404)
-        .then(({ body }) => {
-          expect(body.msg).toBe("ID does not exist");
-        });
-    });
-    test("status: 400, PATCH no input values - responds with an error message when user makes a bad request", () => {
-      const badIncVote = {};
-      return request(app)
-        .patch("/api/reviews/2")
-        .send(badIncVote)
-        .expect(400)
-        .then(({ body }) => {
-          expect(body.msg).toEqual("Empty object");
-        });
+    describe("Query issues", () => {
+      test("status 400: GET api/reviews?sort_by=notvalid responds with message that Bad Request: cannot sort with given parameter", () => {
+        return request(app)
+          .get("/api/reviews?sort_by=playing_time")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe(
+              "Bad Request: cannot sort with given parameter"
+            );
+          });
+      });
+      test("status 400: GET api/reviews?order=notvalid responds with message that Bad Request: Sort order invalid", () => {
+        return request(app)
+          .get("/api/reviews?order=mixed")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Bad Request: Sort order invalid");
+          });
+      });
     });
   });
 });
