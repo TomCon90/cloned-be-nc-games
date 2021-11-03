@@ -247,7 +247,7 @@ describe("testing app():", () => {
   });
   describe("HAPPY PATH /api/comments", () => {
     describe("GET", () => {
-      test.only("status:200 response with an array of comment objects", () => {
+      test("status:200 response with an array of comment objects", () => {
         return request(app)
           .get("/api/comments")
           .expect(200)
@@ -275,7 +275,7 @@ describe("testing app():", () => {
             return request(app).get("/api/comments").expect(200);
           })
           .then(({ body }) => {
-            expect(body.comment).toHaveLength(7);
+            expect(body.comments).toHaveLength(5);
           });
       });
     });
@@ -422,6 +422,24 @@ describe("testing app():", () => {
               expect(body.msg).toBe("Bad Request: Sort order invalid");
             });
         });
+      });
+    });
+    describe("DELETE requests", () => {
+      test("status: 400, DELETE api/comments/notanid responds with an error message when passed a bad user ID", () => {
+        return request(app)
+          .delete("/api/comments/notAnId")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Invalid query");
+          });
+      });
+      test("status: 404, DELETE api/comments/999 responds with an error message when passed a user ID that doesnt exist", () => {
+        return request(app)
+          .delete("/api/comments/30")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("ID does not exist");
+          });
       });
     });
   });

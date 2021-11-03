@@ -4,11 +4,18 @@ const {
 } = require("../models/comments.models");
 
 exports.getAllComments = (req, res, next) => {
-  selectAllComments().then((comments) => {
-    res.status(200).send({ comments });
-  });
+  selectAllComments()
+    .then((comments) => {
+      res.status(200).send({ comments });
+    })
+    .catch(next);
 };
 
 exports.deleteComment = (req, res, next) => {
-  removeComment();
+  const { comment_id } = req.params;
+  removeComment(comment_id)
+    .then(() => {
+      res.status(204).send();
+    })
+    .catch(next);
 };

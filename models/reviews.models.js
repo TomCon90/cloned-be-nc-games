@@ -109,7 +109,6 @@ exports.selectAllCommentsByReviewID = (review_id) => {
 exports.insertComment = (review_id, comment) => {
   const { username, body } = comment;
   const author = username;
-  console.log(typeof body);
   if (typeof body === undefined) {
     return Promise.reject({
       status: 400,
