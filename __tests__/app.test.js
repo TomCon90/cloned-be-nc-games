@@ -83,7 +83,9 @@ describe("testing app():", () => {
             .expect(200)
             .then(({ body }) => {
               const { reviews } = body;
-              expect(reviews).toBeSortedBy("created_at");
+              expect(reviews).toBeSortedBy("created_at", {
+                descending: true,
+              });
             });
         });
         test("status 200: returns all reviews sorted by any specified field", () => {
@@ -92,7 +94,9 @@ describe("testing app():", () => {
             .expect(200)
             .then(({ body }) => {
               const { reviews } = body;
-              expect(reviews).toBeSortedBy("votes");
+              expect(reviews).toBeSortedBy("votes", {
+                descending: true,
+              });
             });
         });
         test("status 200: returns all reviews sorted by any specified field", () => {
@@ -101,26 +105,28 @@ describe("testing app():", () => {
             .expect(200)
             .then(({ body }) => {
               const { reviews } = body;
-              expect(reviews).toBeSortedBy("title");
+              expect(reviews).toBeSortedBy("title", {
+                descending: true,
+              });
             });
         });
         test("status 200: returns all reviews sorted by age in reverse order", () => {
           return request(app)
-            .get("/api/reviews?order=desc")
+            .get("/api/reviews?order=asc")
             .expect(200)
             .then(({ body }) => {
               const { reviews } = body;
-              expect(reviews).toBeSortedBy("created_at", { descending: true });
+              expect(reviews).toBeSortedBy("created_at", { ascending: true });
             });
         });
         test("status 200: Can take two queries sorting by x and ordering by y", () => {
           return request(app)
-            .get("/api/reviews?sort_by=votes&order=desc")
+            .get("/api/reviews?sort_by=votes&order=asc")
             .expect(200)
             .then(({ body }) => {
               const { reviews } = body;
               expect(reviews).toBeSortedBy("votes", {
-                descending: true,
+                ascending: true,
               });
             });
         });
@@ -134,6 +140,21 @@ describe("testing app():", () => {
                 expect(review.category).toBe("dexterity");
               });
               expect(reviews.length).toBe(1);
+            });
+        });
+        test("status 200: returns all reviews that match a filter query on category, sorted by a query, ordered by a query", () => {
+          return request(app)
+            .get("/api/reviews?sort_by=votes&order=asc&category=dexterity")
+            .expect(200)
+            .then(({ body }) => {
+              const { reviews } = body;
+              reviews.forEach((review) => {
+                expect(review.category).toBe("dexterity");
+              });
+              expect(reviews.length).toBe(1);
+              expect(reviews).toBeSortedBy("votes", {
+                descending: true,
+              });
             });
         });
       });
@@ -197,6 +218,28 @@ describe("testing app():", () => {
               category: "dexterity",
               created_at: "2021-01-18T10:01:41.251Z",
               votes: 0,
+            });
+          });
+      });
+    });
+    describe("POST", () => {
+      test("Status 201: responds with the updated review", () => {
+        const newComment = {
+          username: "mallionaire",
+          body: "A great game to TEST your skills",
+        };
+        return request(app)
+          .post("/api/reviews/2/comments")
+          .send(newComment)
+          .expect(201)
+          .then(({ body }) => {
+            expect(body).toEqual({
+              comment_id: 7,
+              review_id: 2,
+              votes: 0,
+              created_at: expect.any(String),
+              author: "mallionaire",
+              body: "A great game to TEST your skills",
             });
           });
       });
@@ -274,24 +317,77 @@ describe("testing app():", () => {
           });
       });
     });
-    describe("Query issues", () => {
-      test("status 400: GET api/reviews?sort_by=notvalid responds with message that Bad Request: cannot sort with given parameter", () => {
+    describe("POST requests", () => {
+      test("status: 400, POST api/reviews/notanID/comments responds with an error message when passed a bad ID", () => {
+        const newComment = {
+          username: "mallionaire",
+          body: "A great game to TEST your skills",
+        };
         return request(app)
-          .get("/api/reviews?sort_by=playing_time")
+          .post("/api/reviews/notAnId/comments")
           .expect(400)
           .then(({ body }) => {
-            expect(body.msg).toBe(
-              "Bad Request: cannot sort with given parameter"
-            );
+            expect(body.msg).toBe("Invalid query");
           });
       });
-      test("status 400: GET api/reviews?order=notvalid responds with message that Bad Request: Sort order invalid", () => {
+      test("status: 404, POST api/reviews/999/comments responds with an error message when passed an Incorrect input", () => {
+        const newComment = {
+          username: "mallionaire",
+          body: "A great game to TEST your skills",
+        };
         return request(app)
-          .get("/api/reviews?order=mixed")
+          .post("/api/reviews/999/comments")
+          .send(newComment)
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Incorrect input");
+          });
+      });
+      test("status: 404, POST api/reviews/2/comments responds with an error message when passed an Incorrect input", () => {
+        const newComment = {
+          username: "tester123",
+          body: "A great game to TEST your skills",
+        };
+        return request(app)
+          .post("/api/reviews/2/comments")
+          .send(newComment)
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Incorrect input");
+          });
+      });
+      test("status: 404, POST api/reviews/2/comments responds with an error message when passed an ID that doesn't exist", () => {
+        const newComment = {
+          username: "mallionaire",
+          body: [],
+        };
+        return request(app)
+          .post("/api/reviews/2/comments")
+          .send(newComment)
           .expect(400)
           .then(({ body }) => {
-            expect(body.msg).toBe("Bad Request: Sort order invalid");
+            expect(body.msg).toBe("Incorrect data type");
           });
+      });
+      describe("Query issues", () => {
+        test("status 400: GET api/reviews?sort_by=notvalid responds with message that Bad Request: cannot sort with given parameter", () => {
+          return request(app)
+            .get("/api/reviews?sort_by=playing_time")
+            .expect(400)
+            .then(({ body }) => {
+              expect(body.msg).toBe(
+                "Bad Request: cannot sort with given parameter"
+              );
+            });
+        });
+        test("status 400: GET api/reviews?order=notvalid responds with message that Bad Request: Sort order invalid", () => {
+          return request(app)
+            .get("/api/reviews?order=mixed")
+            .expect(400)
+            .then(({ body }) => {
+              expect(body.msg).toBe("Bad Request: Sort order invalid");
+            });
+        });
       });
     });
   });

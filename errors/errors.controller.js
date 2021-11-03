@@ -1,4 +1,5 @@
 exports.handle500 = (err, req, res, next) => {
+  console.log(err);
   res.status(500).send({ msg: "Internal Server Error" });
 };
 
@@ -15,6 +16,8 @@ exports.handlePSQLErrors = (err, req, res, next) => {
     res.status(400).send({ msg: "Empty object" });
   } else if (err.code === "22P02") {
     res.status(400).send({ msg: "Invalid query" });
+  } else if (err.code === "23503") {
+    res.status(404).send({ msg: "Incorrect input" });
   } else {
     next(err);
   }

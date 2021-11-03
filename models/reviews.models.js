@@ -51,7 +51,7 @@ exports.selectAllReviews = (sort_by, order, category) => {
     sort_by = "created_at";
   }
   if (!order) {
-    order = "ASC";
+    order = "DESC";
   }
   if (
     ![
@@ -104,4 +104,32 @@ exports.selectAllCommentsByReviewID = (review_id) => {
           .then(({ rows }) => rows);
       }
     });
+};
+
+exports.insertComment = (review_id, comment) => {
+  const { username, body } = comment;
+  const author = username;
+  console.log(typeof body);
+  if (typeof body === undefined) {
+    return Promise.reject({
+      status: 400,
+      msg: "Invalid query",
+    });
+  } else if (body !== undefined && typeof body !== "string") {
+    return Promise.reject({
+      status: 400,
+      msg: "Incorrect data type",
+    });
+  } else {
+    return db
+      .query(
+        `INSERT INTO comments
+       (body,  author, review_id) 
+       VALUES 
+       ($1, $2, $3) 
+       RETURNING *;`,
+        [body, author, review_id]
+      )
+      .then(({ rows }) => rows);
+  }
 };
