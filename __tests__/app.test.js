@@ -245,7 +245,41 @@ describe("testing app():", () => {
       });
     });
   });
-
+  describe("HAPPY PATH /api/comments", () => {
+    describe("GET", () => {
+      test.only("status:200 response with an array of comment objects", () => {
+        return request(app)
+          .get("/api/comments")
+          .expect(200)
+          .then(({ body }) => {
+            const { comments } = body;
+            expect(comments).toHaveLength(6);
+            comments.forEach((comment) => {
+              expect(comment).toMatchObject({
+                comment_id: expect.any(Number),
+                author: expect.any(String),
+                review_id: expect.any(Number),
+                created_at: expect.any(String),
+                body: expect.any(String),
+              });
+            });
+          });
+      });
+    });
+    describe("DELETE", () => {
+      test("Status 204: responds with no content", () => {
+        return request(app)
+          .delete("/api/comments/6")
+          .expect(204)
+          .then(() => {
+            return request(app).get("/api/comments").expect(200);
+          })
+          .then(({ body }) => {
+            expect(body.comment).toHaveLength(7);
+          });
+      });
+    });
+  });
   describe("Errors", () => {
     describe("GET requests", () => {
       test("status 404: GET api/notaroute responds with message that URL not found", () => {
