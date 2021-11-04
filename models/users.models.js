@@ -11,5 +11,15 @@ exports.selectUserByUsernameId = (username_id) => {
   let answer = username_id.username;
   return db
     .query(`SELECT * FROM users WHERE username = $1`, [answer])
-    .then(({ rows }) => rows[0]);
+    .then(({ rows }) => {
+      const user = rows[0];
+      if (user === undefined) {
+        return Promise.reject({
+          status: 404,
+          msg: "Username does not exist",
+        });
+      } else {
+        return user;
+      }
+    });
 };

@@ -326,13 +326,12 @@ describe("testing app():", () => {
         });
       });
       describe("GET", () => {
-        test.only("status 200: responds with a user object", () => {
+        test("status 200: responds with a user object", () => {
           return request(app)
             .get("/api/users/mallionaire")
             .expect(200)
             .then(({ body }) => {
               const users = body;
-              console.log(users);
               const testUsers = {
                 username: expect.any(String),
                 avatar_url: expect.any(String),
@@ -386,6 +385,14 @@ describe("testing app():", () => {
           .expect(404)
           .then(({ body }) => {
             expect(body.msg).toBe("ID does not exist");
+          });
+      });
+      test("status: 404, GET api/users/notanusername responds with an error message when passed a bad ID", () => {
+        return request(app)
+          .get("/api/users/notausername")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Username does not exist");
           });
       });
     });
