@@ -8,6 +8,32 @@ beforeEach(() => seed(testData));
 afterAll(() => db.end());
 
 describe("testing app():", () => {
+  describe("HAPPY PATH /api", () => {
+    describe("GET", () => {
+      test("status 200: returns JSON of all endpoints", () => {
+        return request(app)
+          .get("/api")
+          .expect(200)
+          .then(({ body }) => {
+            const endpoints = body;
+            const testEndpoints = {
+              "GET /api": expect.any(Object),
+              "GET /api/categories": expect.any(Object),
+              "GET /api/reviews": expect.any(Object),
+              "GET /api/reviews/:review_id": expect.any(Object),
+              "PATCH /api/reviews/:review_id": expect.any(Object),
+              "GET /api/reviews/:review_id/comments": expect.any(Object),
+              "POST /api/reviews/:review_id/comments": expect.any(Object),
+              "GET /api/comments": expect.any(Object),
+              "DELETE /api/comments/:comments_id": expect.any(Object),
+            };
+            const keys = Object.keys(endpoints);
+            expect(keys.length).toBe(9);
+            expect(endpoints).toEqual(testEndpoints);
+          });
+      });
+    });
+  });
   describe("HAPPY PATH /api/categories", () => {
     describe("GET", () => {
       test("status 200: returns all categories", () => {
