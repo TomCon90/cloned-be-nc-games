@@ -4,8 +4,11 @@ const app = require("./app");
 //   console.log("listening on 9090");
 // });
 
-const { PORT } = process.env;
-
+let { PORT } = process.env;
+console.log(PORT);
+if (PORT === undefined) {
+  PORT = 9090;
+}
 app.listen(PORT, (err) => {
   if (err) throw err;
   console.log(`Listening on ${PORT}...`);
