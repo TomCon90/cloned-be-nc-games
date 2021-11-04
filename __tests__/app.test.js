@@ -309,7 +309,7 @@ describe("testing app():", () => {
     });
     describe("HAPPY PATH /api/users", () => {
       describe("GET", () => {
-        test.only("status 200: responds with an array of objects containing username", () => {
+        test("status 200: responds with an array of objects containing username", () => {
           return request(app)
             .get("/api/users")
             .expect(200)
@@ -322,6 +322,25 @@ describe("testing app():", () => {
                   username: expect.any(String),
                 });
               });
+            });
+        });
+      });
+      describe("GET", () => {
+        test.only("status 200: responds with a user object", () => {
+          return request(app)
+            .get("/api/users/mallionaire")
+            .expect(200)
+            .then(({ body }) => {
+              const users = body;
+              console.log(users);
+              const testUsers = {
+                username: expect.any(String),
+                avatar_url: expect.any(String),
+                name: expect.any(String),
+              };
+              expect(users).toEqual(testUsers);
+              expect(users.username).toBe("mallionaire");
+              expect(users.name).toBe("haz");
             });
         });
       });

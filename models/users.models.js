@@ -6,3 +6,10 @@ const { commentCountToNumber } = require("../utils/utils");
 exports.selectAllUsernames = () => {
   return db.query(`SELECT username FROM users;`).then((result) => result.rows);
 };
+
+exports.selectUserByUsernameId = (username_id) => {
+  let answer = username_id.username;
+  return db
+    .query(`SELECT * FROM users WHERE username = $1`, [answer])
+    .then(({ rows }) => rows[0]);
+};
