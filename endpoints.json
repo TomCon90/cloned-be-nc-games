@@ -125,6 +125,27 @@
       ]
     }
   },
+  "GET /api/users": {
+    "description": "serves an array of all usernames",
+    "exampleResponse": {
+      "users": [
+        { "username": "mallionaire" },
+        { "username": "philippaclaire9" },
+        { "username": "bainesface" },
+        { "username": "dav3rid" }
+      ]
+    }
+  },
+  "GET /api/users/:username": {
+    "description": "serves a object with the full details of the user specified by the username",
+    "exampleResponse": {
+      "user": {
+        "username": "philippaclaire9",
+        "name": "philippa",
+        "avatar_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4"
+      }
+    }
+  },
   "DELETE /api/comments/:comments_id": {
     "description": "removes the selected comment linked to comment_id"
   }
