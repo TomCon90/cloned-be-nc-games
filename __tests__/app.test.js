@@ -455,7 +455,7 @@ describe("testing app():", () => {
           .get("/api/reviews/notAnId")
           .expect(400)
           .then(({ body }) => {
-            expect(body.msg).toBe("Invalid query");
+            expect(body.msg).toBe("Incorrect ID format");
           });
       });
       test("status: 404, GET api/reviews/999 responds with an error message when passed an ID that doesn't exist", () => {
@@ -466,12 +466,12 @@ describe("testing app():", () => {
             expect(body.msg).toBe("ID does not exist");
           });
       });
-      test.skip("status: 400, GET api/reviews/notanId/comments responds with an error message when passed a bad ID", () => {
+      test("status: 400, GET api/reviews/notanId/comments responds with an error message when passed a bad ID", () => {
         return request(app)
           .get("/api/reviews/notAnId/comments")
           .expect(400)
           .then(({ body }) => {
-            expect(body.msg).toBe("Invalid query");
+            expect(body.msg).toBe("Incorrect ID format");
           });
       });
       test("status: 404, GET api/reviews/999/comments responds with an error message when passed an ID that doesn't exist", () => {
@@ -497,7 +497,7 @@ describe("testing app():", () => {
           .patch("/api/reviews/notAnId")
           .expect(400)
           .then(({ body }) => {
-            expect(body.msg).toBe("Invalid query");
+            expect(body.msg).toBe("Incorrect ID format");
           });
       });
       test("status: 404, PATCH api/reviews/999 responds with an error message when passed an ID that doesn't exist", () => {
@@ -523,7 +523,7 @@ describe("testing app():", () => {
           .patch("/api/comments/notAnId")
           .expect(400)
           .then(({ body }) => {
-            expect(body.msg).toBe("Invalid query");
+            expect(body.msg).toBe("Incorrect ID format");
           });
       });
       test("status: 404, PATCH api/comments/999 responds with an error message when passed an ID that doesn't exist", () => {
@@ -555,7 +555,7 @@ describe("testing app():", () => {
           .post("/api/reviews/notAnId/comments")
           .expect(400)
           .then(({ body }) => {
-            expect(body.msg).toBe("Invalid query");
+            expect(body.msg).toBe("Incorrect ID format");
           });
       });
       test("status: 404, POST api/reviews/999/comments responds with an error message when passed an Incorrect input", () => {
@@ -603,7 +603,7 @@ describe("testing app():", () => {
             .delete("/api/comments/notAnId")
             .expect(400)
             .then(({ body }) => {
-              expect(body.msg).toBe("Invalid query");
+              expect(body.msg).toBe("Incorrect ID format");
             });
         });
         test("status: 404, DELETE api/comments/999 responds with an error message when passed a user ID that doesnt exist", () => {

@@ -2,7 +2,7 @@ exports.handlePSQLErrors = (err, req, res, next) => {
   if (err.code === "23502") {
     res.status(400).send({ msg: "Empty object" });
   } else if (err.code === "22P02") {
-    res.status(400).send({ msg: "Invalid query" });
+    res.status(400).send({ msg: "Incorrect ID format" });
   } else if (err.code === "23503") {
     res.status(404).send({ msg: "Incorrect input" });
   } else {

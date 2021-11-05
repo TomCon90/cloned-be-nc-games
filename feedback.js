@@ -121,7 +121,7 @@
   - ✅ Using parameterized queries for values in `db.query` e.g `$1` and array of variables
   - ✅ Sanitizing any data for tables/columns, e.g. greenlisting when using template literals or pg-format's `%s`
 - ✅ Consistently use either single object argument _**or**_ multiple arguments in model functions
-- [ ] Use `LEFT JOIN` for comment counts
+- ✅ Use `LEFT JOIN` for comment counts
   - You have used a sub query instead!
 ​
 ## Errors

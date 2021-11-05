@@ -105,13 +105,6 @@ exports.selectAllReviews = (sort_by, order, category) => {
 };
 
 exports.selectAllCommentsByReviewID = (review_id) => {
-  if (parseInt(review_id) === NaN) {
-    return Promise.reject({
-      status: 400,
-      msg: "Incorrect format for ID",
-    });
-  }
-
   return db
     .query(`SELECT * FROM reviews WHERE review_id = $1`, [review_id])
     .then(({ rows }) => {
@@ -131,7 +124,7 @@ exports.selectAllCommentsByReviewID = (review_id) => {
 exports.insertComment = (review_id, comment) => {
   const { body, votes, username } = comment;
   const author = username;
-  if (typeof body === undefined) {
+  if (typeof body === undefined && comment !== undefined) {
     return Promise.reject({
       status: 400,
       msg: "Invalid query",
