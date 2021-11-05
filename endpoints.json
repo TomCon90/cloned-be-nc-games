@@ -148,5 +148,27 @@
   },
   "DELETE /api/comments/:comments_id": {
     "description": "removes the selected comment linked to comment_id"
+  },
+  "PATCH /api/comments/:comments_id": {
+    "description": "updates the given field within the comments associated to comment_id",
+    "exampleOriginal": {
+      "review": {
+        "body": "My dog loved this game too!",
+        "votes": 13,
+        "author": "mallionaire",
+        "review_id": 3,
+        "created_at": 1610964545410
+      }
+    }
+  },
+  "example input": { "inc_votes": 10 },
+  "exampleResponse": {
+    "review": {
+      "body": "My dog loved this game too!",
+      "votes": 23,
+      "author": "mallionaire",
+      "review_id": 3,
+      "created_at": 1610964545410
+    }
   }
 }
