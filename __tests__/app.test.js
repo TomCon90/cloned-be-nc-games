@@ -306,6 +306,42 @@ describe("testing app():", () => {
             });
         });
       });
+      describe("PATCH", () => {
+        test("Status 200: responds with the updated review", () => {
+          const update = { inc_votes: 10 };
+          return request(app)
+            .patch("/api/comments/2")
+            .send(update)
+            .expect(200)
+            .then(({ body }) => {
+              expect(body).toEqual({
+                body: "My dog loved this game too!",
+                votes: 23,
+                comment_id: 2,
+                author: "mallionaire",
+                review_id: 3,
+                created_at: expect.any(String),
+              });
+            });
+        });
+        test("Status 200: responds with the updated review", () => {
+          const minusUpdate = { inc_votes: -5 };
+          return request(app)
+            .patch("/api/comments/2")
+            .send(minusUpdate)
+            .expect(200)
+            .then(({ body }) => {
+              expect(body).toEqual({
+                body: "My dog loved this game too!",
+                votes: 8,
+                comment_id: 2,
+                author: "mallionaire",
+                review_id: 3,
+                created_at: expect.any(String),
+              });
+            });
+        });
+      });
     });
     describe("HAPPY PATH /api/users", () => {
       describe("GET", () => {
@@ -417,6 +453,32 @@ describe("testing app():", () => {
         const badIncVote = {};
         return request(app)
           .patch("/api/reviews/2")
+          .send(badIncVote)
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toEqual("Empty object");
+          });
+      });
+      test("status: 400, PATCH api/comments/notanID responds with an error message when passed a bad ID", () => {
+        return request(app)
+          .patch("/api/comments/notAnId")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Invalid query");
+          });
+      });
+      test("status: 404, PATCH api/comments/999 responds with an error message when passed an ID that doesn't exist", () => {
+        return request(app)
+          .patch("/api/comments/999")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("ID does not exist");
+          });
+      });
+      test("status: 400, PATCH no input values - responds with an error message when user makes a bad request", () => {
+        const badIncVote = {};
+        return request(app)
+          .patch("/api/comments/2")
           .send(badIncVote)
           .expect(400)
           .then(({ body }) => {
