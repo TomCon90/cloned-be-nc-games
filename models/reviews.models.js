@@ -47,49 +47,71 @@ exports.patchReviewsByID = (review_id, inc_votes) => {
 };
 
 exports.selectAllReviews = (sort_by, order, category) => {
-  if (!sort_by) {
-    sort_by = "created_at";
-  }
-  if (!order) {
-    order = "DESC";
-  }
-  if (
-    ![
-      "owner",
-      "title",
-      "review_id",
-      "category",
-      "review_img_url",
-      "created_at",
-      "votes",
-      "comment_count",
-    ].includes(sort_by.toLowerCase())
-  ) {
-    return Promise.reject({
-      status: 400,
-      msg: "Bad Request: cannot sort with given parameter",
-    });
-  } else if (!["asc", "desc"].includes(order.toLowerCase())) {
-    return Promise.reject({
-      status: 400,
-      msg: "Bad Request: Sort order invalid",
-    });
-  } else {
-    const queryParams = [];
-    let queryStr = `SELECT * , (SELECT COUNT(*) FROM comments) AS comment_count FROM reviews`;
-    if (category) {
-      queryStr += ` WHERE category = $1`;
-      queryParams.push(category);
+  return db.query(`SELECT slug FROM categories;`).then(({ rows }) => {
+    const categories = rows;
+    let count = 0;
+    for (let i = 0; i < categories.length; i++) {
+      if (categories[i].slug === category) {
+        count++;
+      }
     }
-    queryStr += ` ORDER BY ${sort_by} ${order};`;
-    return db.query(queryStr, queryParams).then(({ rows }) => {
-      commentCountToNumber(rows);
-      return rows;
-    });
-  }
+    if (count === 0 && category !== undefined) {
+      return Promise.reject({
+        status: 400,
+        msg: "Bad Request: Invalid category",
+      });
+    }
+    if (!sort_by) {
+      sort_by = "created_at";
+    }
+    if (!order) {
+      order = "DESC";
+    }
+    if (
+      ![
+        "owner",
+        "title",
+        "review_id",
+        "category",
+        "review_img_url",
+        "created_at",
+        "votes",
+        "comment_count",
+      ].includes(sort_by.toLowerCase())
+    ) {
+      return Promise.reject({
+        status: 400,
+        msg: "Bad Request: cannot sort with given parameter",
+      });
+    } else if (!["asc", "desc"].includes(order.toLowerCase())) {
+      return Promise.reject({
+        status: 400,
+        msg: "Bad Request: Sort order invalid",
+      });
+    } else {
+      const queryParams = [];
+      let queryStr = `SELECT * , (SELECT COUNT(*) FROM comments) AS comment_count FROM reviews`;
+      if (category) {
+        queryStr += ` WHERE category = $1`;
+        queryParams.push(category);
+      }
+      queryStr += ` ORDER BY ${sort_by} ${order};`;
+      return db.query(queryStr, queryParams).then(({ rows }) => {
+        commentCountToNumber(rows);
+        return rows;
+      });
+    }
+  });
 };
 
 exports.selectAllCommentsByReviewID = (review_id) => {
+  if (parseInt(review_id) === NaN) {
+    return Promise.reject({
+      status: 400,
+      msg: "Incorrect format for ID",
+    });
+  }
+
   return db
     .query(`SELECT * FROM reviews WHERE review_id = $1`, [review_id])
     .then(({ rows }) => {
@@ -107,7 +129,7 @@ exports.selectAllCommentsByReviewID = (review_id) => {
 };
 
 exports.insertComment = (review_id, comment) => {
-  const { username, body } = comment;
+  const { body, votes, username } = comment;
   const author = username;
   if (typeof body === undefined) {
     return Promise.reject({

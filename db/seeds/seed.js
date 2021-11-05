@@ -38,11 +38,11 @@ const seed = (data) => {
       title VARCHAR(255) NOT NULL,
       review_body VARCHAR NOT NULL,
       designer VARCHAR(255) NOT NULL,
-      review_img_url VARCHAR DEFAULT 'https://images.pexels.com/photos/163064/play-stone-network-networked-interactive-163064.jpeg',
-      votes SMALLINT DEFAULT 0,
+      review_img_url VARCHAR NOT NULL DEFAULT 'https://images.pexels.com/photos/163064/play-stone-network-networked-interactive-163064.jpeg',
+      votes SMALLINT NOT NULL DEFAULT 0,
       category VARCHAR NOT NULL REFERENCES categories(slug),
       owner VARCHAR NOT NULL REFERENCES users(username),
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
   );`);
     })
     .then(() => {
@@ -50,9 +50,9 @@ const seed = (data) => {
   CREATE TABLE comments (
       comment_id SERIAL PRIMARY KEY,
       author VARCHAR NOT NULL REFERENCES users(username),
-      review_id INT REFERENCES reviews(review_id),
-      votes SMALLINT DEFAULT 0,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      review_id INT REFERENCES reviews(review_id) ON DELETE CASCADE,
+      votes SMALLINT NOT NULL DEFAULT 0,
+      created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
       body VARCHAR NOT NULL
   );`);
     })

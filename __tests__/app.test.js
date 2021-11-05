@@ -55,31 +55,29 @@ describe("testing app():", () => {
         });
       });
     });
+    describe("HAPPY PATH /api/reviews/:review_id", () => {
+      test("status 200: returns the reviews for the given id", () => {
+        return request(app)
+          .get("/api/reviews/2")
+          .expect(200)
+          .then(({ body }) => {
+            const review = body;
+            expect(review.review.title).toBe("Jenga");
+            expect(review.review.comment_count).toEqual(3);
+            expect(review.review.review_id).toEqual(2);
+            expect(review.review.owner).toEqual("philippaclaire9");
+            expect(review.review.review_body).toEqual(
+              "Fiddly fun for all the family"
+            );
+            expect(review.review.designer).toEqual("Leslie Scott");
+            expect(review.review.category).toEqual("dexterity");
+            expect(review.review.votes).toEqual(5);
+          });
+      });
+    });
     describe("HAPPY PATH /api/reviews", () => {
       describe("GET", () => {
         describe("GET reviews", () => {
-          test("status 200: returns the reviews for the given id", () => {
-            return request(app)
-              .get("/api/reviews/2")
-              .expect(200)
-              .then(({ body }) => {
-                const review = body;
-                const testReviews = {
-                  review_id: expect.any(Number),
-                  owner: expect.any(String),
-                  title: expect.any(String),
-                  review_body: expect.any(String),
-                  designer: expect.any(String),
-                  review_img_url: expect.any(String),
-                  category: expect.any(String),
-                  created_at: expect.any(Date),
-                  votes: expect.any(Number),
-                  comment_count: expect.any(Number),
-                };
-                expect(review.review.title).toBe("Jenga");
-                expect(review.review.comment_count).toEqual(3);
-              });
-          });
           test("status 200: returns all reviews", () => {
             return request(app)
               .get("/api/reviews")
@@ -169,6 +167,15 @@ describe("testing app():", () => {
                 expect(reviews.length).toBe(1);
               });
           });
+          test("status 200: returns an empty array when given a category that is valid but with no reviews", () => {
+            return request(app)
+              .get("/api/reviews?category=children's games")
+              .expect(200)
+              .then(({ body }) => {
+                const { reviews } = body;
+                expect(reviews).toEqual([]);
+              });
+          });
           test("status 200: returns all reviews that match a filter query on category, sorted by a query, ordered by a query", () => {
             return request(app)
               .get("/api/reviews?sort_by=votes&order=asc&category=dexterity")
@@ -192,15 +199,20 @@ describe("testing app():", () => {
               .expect(200)
               .then(({ body }) => {
                 const { comments } = body;
-                const testComments = {
-                  comment_id: expect.any(Number),
-                  author: expect.any(String),
-                  votes: expect.any(String),
-                  created_at: expect.any(String),
-                  body: expect.any(String),
-                };
                 expect(comments.length).toBe(3);
+                expect(comments[0].comment_id).toEqual(1);
                 expect(comments[0].author).toEqual("bainesface");
+                expect(comments[0].votes).toEqual(16);
+                expect(comments[0].body).toEqual("I loved this game too!");
+              });
+          });
+          test("status 200: returns an empty array when given a valid review_id but with no comments", () => {
+            return request(app)
+              .get("/api/reviews/1/comments")
+              .expect(200)
+              .then(({ body }) => {
+                const { comments } = body;
+                expect(comments).toEqual([]);
               });
           });
         });
@@ -258,6 +270,27 @@ describe("testing app():", () => {
           return request(app)
             .post("/api/reviews/2/comments")
             .send(newComment)
+            .expect(201)
+            .then(({ body }) => {
+              expect(body).toEqual({
+                comment_id: 7,
+                review_id: 2,
+                votes: 0,
+                created_at: expect.any(String),
+                author: "mallionaire",
+                body: "A great game to TEST your skills",
+              });
+            });
+        });
+        test("Status 201: responds with updated comments excluding additional fields ", () => {
+          const tooManyUpdates = {
+            username: "mallionaire",
+            body: "A great game to TEST your skills",
+            test: "tester",
+          };
+          return request(app)
+            .post("/api/reviews/2/comments")
+            .send(tooManyUpdates)
             .expect(201)
             .then(({ body }) => {
               expect(body).toEqual({
@@ -391,6 +424,32 @@ describe("testing app():", () => {
             expect(body.msg).toBe("URL not found");
           });
       });
+      test("status 400: GET api/reviews?sort_by=notvalid responds with message that Bad Request: cannot sort with given parameter", () => {
+        return request(app)
+          .get("/api/reviews?sort_by=playing_time")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe(
+              "Bad Request: cannot sort with given parameter"
+            );
+          });
+      });
+      test("status 400: GET api/reviews?order=notvalid responds with message that Bad Request: Sort order invalid", () => {
+        return request(app)
+          .get("/api/reviews?order=mixed")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Bad Request: Sort order invalid");
+          });
+      });
+      test("status 400: GET api/reviews?category=notvalid responds with message that Bad Request: Sort order invalid", () => {
+        return request(app)
+          .get("/api/reviews?category=bananas")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Bad Request: Invalid category");
+          });
+      });
       test("status: 400, GET api/reviews/notanId responds with an error message when passed a bad ID", () => {
         return request(app)
           .get("/api/reviews/notAnId")
@@ -407,7 +466,7 @@ describe("testing app():", () => {
             expect(body.msg).toBe("ID does not exist");
           });
       });
-      test("status: 400, GET api/reviews/notanId/comments responds with an error message when passed a bad ID", () => {
+      test.skip("status: 400, GET api/reviews/notanId/comments responds with an error message when passed a bad ID", () => {
         return request(app)
           .get("/api/reviews/notAnId/comments")
           .expect(400)
@@ -538,43 +597,23 @@ describe("testing app():", () => {
             expect(body.msg).toBe("Incorrect data type");
           });
       });
-      describe("Query issues", () => {
-        test("status 400: GET api/reviews?sort_by=notvalid responds with message that Bad Request: cannot sort with given parameter", () => {
+      describe("DELETE requests", () => {
+        test("status: 400, DELETE api/comments/notanid responds with an error message when passed a bad user ID", () => {
           return request(app)
-            .get("/api/reviews?sort_by=playing_time")
+            .delete("/api/comments/notAnId")
             .expect(400)
             .then(({ body }) => {
-              expect(body.msg).toBe(
-                "Bad Request: cannot sort with given parameter"
-              );
+              expect(body.msg).toBe("Invalid query");
             });
         });
-        test("status 400: GET api/reviews?order=notvalid responds with message that Bad Request: Sort order invalid", () => {
+        test("status: 404, DELETE api/comments/999 responds with an error message when passed a user ID that doesnt exist", () => {
           return request(app)
-            .get("/api/reviews?order=mixed")
-            .expect(400)
+            .delete("/api/comments/30")
+            .expect(404)
             .then(({ body }) => {
-              expect(body.msg).toBe("Bad Request: Sort order invalid");
+              expect(body.msg).toBe("ID does not exist");
             });
         });
-      });
-    });
-    describe("DELETE requests", () => {
-      test("status: 400, DELETE api/comments/notanid responds with an error message when passed a bad user ID", () => {
-        return request(app)
-          .delete("/api/comments/notAnId")
-          .expect(400)
-          .then(({ body }) => {
-            expect(body.msg).toBe("Invalid query");
-          });
-      });
-      test("status: 404, DELETE api/comments/999 responds with an error message when passed a user ID that doesnt exist", () => {
-        return request(app)
-          .delete("/api/comments/30")
-          .expect(404)
-          .then(({ body }) => {
-            expect(body.msg).toBe("ID does not exist");
-          });
       });
     });
   });
