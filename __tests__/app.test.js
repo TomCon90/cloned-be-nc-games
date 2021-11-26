@@ -178,7 +178,7 @@ describe("testing app():", () => {
           });
           test("status 200: returns all reviews that match a filter query on category, sorted by a query, ordered by a query", () => {
             return request(app)
-              .get("/api/reviews?sort_by=votes&order=asc&category=dexterity")
+              .get("/api/reviews?category=dexterity&sort_by=votes&order=asc")
               .expect(200)
               .then(({ body }) => {
                 const { reviews } = body;

@@ -90,11 +90,16 @@ exports.selectAllReviews = (sort_by, order, category) => {
       });
     } else {
       const queryParams = [];
-      let queryStr = `SELECT * , (SELECT COUNT(*) FROM comments) AS comment_count FROM reviews`;
+      let queryStr = `SELECT reviews.*,
+       COUNT(comments.review_id) AS comment_count 
+       FROM reviews
+       LEFT JOIN comments ON 
+        reviews.review_id = comments.review_id  `;
       if (category) {
-        queryStr += ` WHERE category = $1`;
+        queryStr += `WHERE reviews.category = $1`;
         queryParams.push(category);
       }
+      queryStr += `GROUP BY reviews.review_id`;
       queryStr += ` ORDER BY ${sort_by} ${order};`;
       return db.query(queryStr, queryParams).then(({ rows }) => {
         commentCountToNumber(rows);
