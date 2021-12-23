@@ -49,12 +49,15 @@ exports.patchReviewsByID = (review_id, inc_votes) => {
 exports.selectAllReviews = (sort_by, order, category) => {
   return db.query(`SELECT slug FROM categories;`).then(({ rows }) => {
     const categories = rows;
+    console.log(rows);
+    console.log(category);
     let count = 0;
     for (let i = 0; i < categories.length; i++) {
       if (categories[i].slug === category) {
         count++;
       }
     }
+    console.log(count);
     if (count === 0 && category !== undefined) {
       return Promise.reject({
         status: 400,
@@ -109,9 +112,17 @@ exports.selectAllReviews = (sort_by, order, category) => {
   });
 };
 
-exports.selectAllCommentsByReviewID = (review_id) => {
+exports.selectAllCommentsByReviewID = (review_id, limit = 10, p = 1) => {
+  const offset = (p - 1) * limit;
+  console.log(offset, "<<<OFFSET");
+  console.log(limit, "<<<LIMIT");
   return db
-    .query(`SELECT * FROM reviews WHERE review_id = $1`, [review_id])
+    .query(
+      `SELECT * 
+    FROM reviews 
+    WHERE review_id = $1`,
+      [review_id]
+    )
     .then(({ rows }) => {
       if (rows.length === 0) {
         return Promise.reject({
@@ -120,7 +131,10 @@ exports.selectAllCommentsByReviewID = (review_id) => {
         });
       } else {
         return db
-          .query(`SELECT * FROM comments WHERE review_id = $1`, [review_id])
+          .query(
+            `SELECT * FROM comments WHERE review_id = $1 LIMIT $2 OFFSET $3;`,
+            [review_id, limit, offset]
+          )
           .then(({ rows }) => rows);
       }
     });

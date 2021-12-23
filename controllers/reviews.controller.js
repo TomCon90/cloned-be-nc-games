@@ -29,6 +29,7 @@ exports.getAllReviews = (req, res, next) => {
   const { sort_by, order, category } = req.query;
   selectAllReviews(sort_by, order, category)
     .then((reviews) => {
+      console.log(reviews, "<<<reviews");
       res.status(200).send({ reviews });
     })
     .catch(next);
@@ -36,7 +37,8 @@ exports.getAllReviews = (req, res, next) => {
 
 exports.getCommentsByReviewID = (req, res, next) => {
   const { review_id } = req.params;
-  selectAllCommentsByReviewID(review_id)
+  const { limit, p } = req.query;
+  selectAllCommentsByReviewID(review_id, limit, p)
     .then((comments) => {
       res.status(200).send({ comments });
     })

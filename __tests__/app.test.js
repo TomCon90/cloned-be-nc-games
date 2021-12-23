@@ -216,6 +216,36 @@ describe("testing app():", () => {
               });
           });
         });
+        describe("LIMIT & PAGINATION", () => {
+          test("status 200: responds with an array of up to 10 reviews by default", () => {
+            return request(app)
+              .get("/api/reviews/3/comments")
+              .expect(200)
+              .then(({ body }) => {
+                const { comments } = body;
+                expect(comments.length).toBe(3);
+              });
+          });
+          test("accepts a limit query which limits the number of comments in response", () => {
+            return request(app)
+              .get("/api/reviews/3/comments?limit=2")
+              .expect(200)
+              .then(({ body }) => {
+                const { comments } = body;
+                expect(comments.length).toBe(2);
+              });
+          });
+          test("accepts a p query and responds with comments for that page", () => {
+            return request(app)
+              .get("/api/reviews/3/comments?limit=2&p=2")
+              .expect(200)
+              .then(({ body }) => {
+                console.log(body);
+                const { comments } = body;
+                expect(comments.length).toBe(1);
+              });
+          });
+        });
       });
       describe("PATCH", () => {
         test("Status 200: responds with the updated review", () => {
@@ -447,6 +477,7 @@ describe("testing app():", () => {
           .get("/api/reviews?category=bananas")
           .expect(400)
           .then(({ body }) => {
+            console.log(body);
             expect(body.msg).toBe("Bad Request: Invalid category");
           });
       });

@@ -54,7 +54,7 @@ In addition to the above there is one further important setup step. To determine
 
 For safety these files will automatically be placed within the .gitignore file
 
-Finally the API will the following;
+Finally the API will need the following;
 
 - `Node.js` version 6.9.0 or above.
 - `postgres` version 2.2.0 or above.
