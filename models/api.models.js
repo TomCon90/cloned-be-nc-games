@@ -1,7 +1,7 @@
 const db = require("../db");
 
 exports.selectAllEndpoints = () => {
-  const endpoints = {
+  return {
     "GET /api": {
       description:
         "serves up a json representation of all the available endpoints of the api",
@@ -214,6 +214,4 @@ exports.selectAllEndpoints = () => {
       },
     },
   };
-
-  return endpoints;
 };
