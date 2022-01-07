@@ -1,3 +1,4 @@
+const { type } = require("express/lib/response");
 const { query } = require("../db");
 const db = require("../db");
 const { commentCountToNumber } = require("../utils/utils");
@@ -46,29 +47,35 @@ exports.patchReviewsByID = (review_id, inc_votes) => {
     });
 };
 
-exports.selectAllReviews = (sort_by, order, category) => {
+exports.selectAllReviews = (sort_by, order, category, limit, p) => {
   return db.query(`SELECT slug FROM categories;`).then(({ rows }) => {
     const categories = rows;
-    console.log(rows);
-    console.log(category);
+
     let count = 0;
     for (let i = 0; i < categories.length; i++) {
       if (categories[i].slug === category) {
         count++;
       }
     }
-    console.log(count);
+
     if (count === 0 && category !== undefined) {
       return Promise.reject({
         status: 400,
         msg: "Bad Request: Invalid category",
       });
     }
+
     if (!sort_by) {
       sort_by = "created_at";
     }
     if (!order) {
       order = "DESC";
+    }
+    if (!limit) {
+      limit = 10;
+    }
+    if (!p) {
+      p = 1;
     }
     if (
       ![
@@ -94,7 +101,7 @@ exports.selectAllReviews = (sort_by, order, category) => {
     } else {
       const queryParams = [];
       let queryStr = `SELECT reviews.*,
-       COUNT(comments.review_id) AS comment_count 
+       COUNT(comments.review_id) AS comment_count
        FROM reviews
        LEFT JOIN comments ON 
         reviews.review_id = comments.review_id  `;
@@ -103,7 +110,13 @@ exports.selectAllReviews = (sort_by, order, category) => {
         queryParams.push(category);
       }
       queryStr += `GROUP BY reviews.review_id`;
-      queryStr += ` ORDER BY ${sort_by} ${order};`;
+
+      queryStr += ` ORDER BY ${sort_by} ${order}`;
+
+      const offset = (p - 1) * limit;
+
+      queryStr += ` LIMIT ${limit} OFFSET ${offset};`;
+
       return db.query(queryStr, queryParams).then(({ rows }) => {
         commentCountToNumber(rows);
         return rows;
@@ -114,8 +127,7 @@ exports.selectAllReviews = (sort_by, order, category) => {
 
 exports.selectAllCommentsByReviewID = (review_id, limit = 10, p = 1) => {
   const offset = (p - 1) * limit;
-  console.log(offset, "<<<OFFSET");
-  console.log(limit, "<<<LIMIT");
+
   return db
     .query(
       `SELECT * 
@@ -165,4 +177,54 @@ exports.insertComment = (review_id, comment) => {
       )
       .then(({ rows }) => rows);
   }
+};
+
+exports.insertReview = (review) => {
+  const { title, designer, review_body } = review;
+  if (
+    typeof title !== "string" ||
+    typeof designer !== "string" ||
+    typeof review_body !== "string"
+  ) {
+    return Promise.reject({
+      status: 400,
+      msg: "Incorrect data type",
+    });
+  } else {
+    return db
+      .query(
+        `INSERT INTO reviews
+       (title, designer, owner, review_img_url, review_body, category, created_at, votes)
+       VALUES
+       ($1, $2, $3, $4, $5, $6, $7, $8)
+       RETURNING *;`,
+        [
+          review.title,
+          review.designer,
+          review.owner,
+          "https://images.pexels.com/photos/163064/play-stone-network-networked-interactive-163064.jpeg",
+          review.review_body,
+          review.category,
+          "2021-01-18T10:01:41.251Z",
+          0,
+        ]
+      )
+
+      .then(({ rows }) => rows);
+  }
+};
+
+exports.removeReview = (review_id) => {
+  return db.query(`DELETE FROM reviews WHERE review_id = $1 RETURNING *;`, [
+    review_id,
+  ]);
+  .then(({ rows }) => {
+    const review = rows[0];
+    if (!review) {
+      return Promise.reject({
+        status: 404,
+        msg: "ID does not exist",
+      });
+    }
+  });
 };

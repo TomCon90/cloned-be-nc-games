@@ -85,16 +85,18 @@ const seed = (data) => {
       VALUES
       %L
       RETURNING *;`,
-        reviewData.map((item) => [
-          item.title,
-          item.designer,
-          item.owner,
-          item.review_img_url,
-          item.review_body,
-          item.category,
-          item.created_at,
-          item.votes,
-        ])
+        reviewData.map((item) => {
+          return [
+            item.title,
+            item.designer,
+            item.owner,
+            item.review_img_url,
+            item.review_body,
+            item.category,
+            item.created_at,
+            item.votes,
+          ];
+        })
       );
       return db.query(queryStr);
     })

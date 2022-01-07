@@ -5,6 +5,8 @@ const {
   getAllReviews,
   getCommentsByReviewID,
   postNewComment,
+  postNewReview,
+  deleteReviewByID,
 } = require("../controllers/reviews.controller");
 const reviews = require("../db/data/test-data/reviews");
 
@@ -14,9 +16,10 @@ reviewsRouter
   .post(postNewComment);
 reviewsRouter
   .route("/:review_id")
+  .delete(deleteReviewByID)
   .get(getAllReviewsByID)
   .patch(updateReviewsByID);
 
-reviewsRouter.get("/", getAllReviews);
+reviewsRouter.route("/").get(getAllReviews).post(postNewReview);
 
 module.exports = reviewsRouter;
