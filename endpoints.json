@@ -170,4 +170,34 @@
       "review_id": 3,
       "created_at": 1610964545410
     }
+  },
+  "DELETE /api/reviews/:review_id": {
+    "description": "removes the selected review linked to review_id"
+  },
+  "POST /api/reviews": {
+    "description": "adds a new review",
+    "exampleResponse": {
+      "review": {
+        "owner": "mallionaire",
+        "title": "This game TESTS my patience!",
+        "review_body": "I TESTED this game and it passed the TEST",
+        "designer": "Uwe Rosenberg",
+        "category": "dexterity",
+        "review_img_url": "https://images.pexels.com/photos/5350049/pexels-photo-5350049.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
+        "review_id": 45,
+        "votes": 0,
+        "created_at": 1610964545410,
+        "comment_count": 0
+      }
+    }
+  },
+  "POST /api/categories": {
+    "description": "adds a new category",
+    "exampleResponse": {
+      "category": {
+        "slug": "difficult",
+        "description": "This game is particularly tricky"
+      }
+    }
   }
+}
