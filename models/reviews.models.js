@@ -215,16 +215,15 @@ exports.insertReview = (review) => {
 };
 
 exports.removeReview = (review_id) => {
-  return db.query(`DELETE FROM reviews WHERE review_id = $1 RETURNING *;`, [
-    review_id,
-  ]);
-  .then(({ rows }) => {
-    const review = rows[0];
-    if (!review) {
-      return Promise.reject({
-        status: 404,
-        msg: "ID does not exist",
-      });
-    }
-  });
+  return db
+    .query(`DELETE FROM reviews WHERE review_id = $1 RETURNING *;`, [review_id])
+    .then(({ rows }) => {
+      const review = rows[0];
+      if (!review) {
+        return Promise.reject({
+          status: 404,
+          msg: "ID does not exist",
+        });
+      }
+    });
 };
