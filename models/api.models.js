@@ -134,9 +134,86 @@ exports.selectAllEndpoints = () => {
         ],
       },
     },
+    "GET /api/users": {
+      description: "serves an array of all usernames",
+      exampleResponse: {
+        users: [
+          { username: "mallionaire" },
+          { username: "philippaclaire9" },
+          { username: "bainesface" },
+          { username: "dav3rid" },
+        ],
+      },
+    },
+    "GET /api/users/:username": {
+      description:
+        "serves a object with the full details of the user specified by the username",
+      exampleResponse: {
+        user: {
+          username: "philippaclaire9",
+          name: "philippa",
+          avatar_url:
+            "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4",
+        },
+      },
+    },
     "DELETE /api/comments/:comments_id": {
       description: "removes the selected comment linked to comment_id",
     },
+    "PATCH /api/comments/:comments_id": {
+      description:
+        "updates the given field within the comments associated to comment_id",
+      exampleOriginal: {
+        review: {
+          body: "My dog loved this game too!",
+          votes: 13,
+          author: "mallionaire",
+          review_id: 3,
+          created_at: 1610964545410,
+        },
+      },
+    },
+    "example input": { inc_votes: 10 },
+    exampleResponse: {
+      review: {
+        body: "My dog loved this game too!",
+        votes: 23,
+        author: "mallionaire",
+        review_id: 3,
+        created_at: 1610964545410,
+      },
+    },
+    "DELETE /api/reviews/:review_id": {
+      description: "removes the selected review linked to review_id",
+    },
+    "POST /api/reviews": {
+      description: "adds a new review",
+      exampleResponse: {
+        review: {
+          owner: "mallionaire",
+          title: "This game TESTS my patience!",
+          review_body: "I TESTED this game and it passed the TEST",
+          designer: "Uwe Rosenberg",
+          category: "dexterity",
+          review_img_url:
+            "https://images.pexels.com/photos/5350049/pexels-photo-5350049.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
+          review_id: 45,
+          votes: 0,
+          created_at: 1610964545410,
+          comment_count: 0,
+        },
+      },
+    },
+    "POST /api/categories": {
+      description: "adds a new category",
+      exampleResponse: {
+        category: {
+          slug: "difficult",
+          description: "This game is particularly tricky",
+        },
+      },
+    },
   };
+
   return endpoints;
 };
