@@ -1,4 +1,5 @@
 exports.handlePSQLErrors = (err, req, res, next) => {
+  console.log(err);
   if (err.code === "23502") {
     res.status(400).send({ msg: "Empty object" });
   } else if (err.code === "22P02") {
