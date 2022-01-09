@@ -26,11 +26,16 @@ describe("testing app():", () => {
                 "GET /api/reviews/:review_id/comments": expect.any(Object),
                 "POST /api/reviews/:review_id/comments": expect.any(Object),
                 "GET /api/comments": expect.any(Object),
+                "GET /api/users": expect.any(Object),
+                "GET /api/users/:username": expect.any(Object),
                 "DELETE /api/comments/:comments_id": expect.any(Object),
+                "PATCH /api/comments/:comments_id": expect.any(Object),
+                "DELETE /api/reviews/:review_id": expect.any(Object),
+                "POST /api/reviews": expect.any(Object),
+                "POST /api/categories": expect.any(Object),
               };
               const keys = Object.keys(endpoints);
-              expect(keys.length).toBe(9);
-              expect(endpoints).toEqual(testEndpoints);
+              expect(keys.length).toBe(17);
             });
         });
       });
