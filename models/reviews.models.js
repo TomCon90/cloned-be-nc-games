@@ -180,7 +180,8 @@ exports.insertComment = (review_id, comment) => {
 };
 
 exports.insertReview = (review) => {
-  const { title, designer, review_body } = review;
+  console.log(review);
+  const { title, designer, review_body, category, owner } = review;
   if (
     typeof title !== "string" ||
     typeof designer !== "string" ||
@@ -199,12 +200,12 @@ exports.insertReview = (review) => {
        ($1, $2, $3, $4, $5, $6, $7, $8)
        RETURNING *;`,
         [
-          review.title,
-          review.designer,
-          review.owner,
+          title,
+          designer,
+          owner,
           "https://images.pexels.com/photos/163064/play-stone-network-networked-interactive-163064.jpeg",
-          review.review_body,
-          review.category,
+          review_body,
+          category,
           "2021-01-18T10:01:41.251Z",
           0,
         ]

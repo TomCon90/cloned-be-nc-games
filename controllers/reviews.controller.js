@@ -61,8 +61,8 @@ exports.postNewReview = (req, res, next) => {
   const review = req.body;
   insertReview(review)
     .then((review) => {
-      console.log(review);
       review[0].comment_count = 0;
+
       res.status(201).send(review[0]);
     })
     .catch(next);
