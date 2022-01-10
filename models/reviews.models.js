@@ -180,7 +180,6 @@ exports.insertComment = (review_id, comment) => {
 };
 
 exports.insertReview = (review) => {
-  console.log(review);
   const { title, designer, review_body, category, owner } = review;
   if (
     typeof title !== "string" ||
@@ -195,9 +194,9 @@ exports.insertReview = (review) => {
     return db
       .query(
         `INSERT INTO reviews
-       (title, designer, owner, review_img_url, review_body, category, created_at, votes)
+       (title, designer, owner, review_img_url, review_body, category, created_at, votes, review_id)
        VALUES
-       ($1, $2, $3, $4, $5, $6, $7, $8)
+       ($1, $2, $3, $4, $5, $6, $7, $8, $9)
        RETURNING *;`,
         [
           title,
@@ -208,6 +207,7 @@ exports.insertReview = (review) => {
           category,
           "2021-01-18T10:01:41.251Z",
           0,
+          33,
         ]
       )
 
