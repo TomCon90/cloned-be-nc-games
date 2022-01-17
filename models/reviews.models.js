@@ -47,7 +47,13 @@ exports.patchReviewsByID = (review_id, inc_votes) => {
     });
 };
 
-exports.selectAllReviews = (sort_by, order, category, limit, p) => {
+exports.selectAllReviews = (
+  sort_by = "created_at",
+  order = "DESC",
+  category,
+  limit = 10,
+  p = 1
+) => {
   return db.query(`SELECT slug FROM categories;`).then(({ rows }) => {
     const categories = rows;
 
@@ -65,18 +71,6 @@ exports.selectAllReviews = (sort_by, order, category, limit, p) => {
       });
     }
 
-    if (!sort_by) {
-      sort_by = "created_at";
-    }
-    if (!order) {
-      order = "DESC";
-    }
-    if (!limit) {
-      limit = 10;
-    }
-    if (!p) {
-      p = 1;
-    }
     if (
       ![
         "owner",
@@ -116,6 +110,8 @@ exports.selectAllReviews = (sort_by, order, category, limit, p) => {
       const offset = (p - 1) * limit;
 
       queryStr += ` LIMIT ${limit} OFFSET ${offset};`;
+
+      console.log(queryStr, "Query String");
 
       return db.query(queryStr, queryParams).then(({ rows }) => {
         commentCountToNumber(rows);
@@ -180,6 +176,7 @@ exports.insertComment = (review_id, comment) => {
 };
 
 exports.insertReview = (review) => {
+  console.log(review, "IN MODEL");
   const { title, designer, review_body, category, owner } = review;
   if (
     typeof title !== "string" ||
@@ -194,9 +191,9 @@ exports.insertReview = (review) => {
     return db
       .query(
         `INSERT INTO reviews
-       (title, designer, owner, review_img_url, review_body, category, created_at, votes, review_id)
+       (title, designer, owner, review_img_url, review_body, category, created_at, votes)
        VALUES
-       ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+       ($1, $2, $3, $4, $5, $6, $7, $8)
        RETURNING *;`,
         [
           title,
@@ -207,7 +204,6 @@ exports.insertReview = (review) => {
           category,
           "2021-01-18T10:01:41.251Z",
           0,
-          33,
         ]
       )
 

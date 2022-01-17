@@ -28,7 +28,13 @@ exports.updateReviewsByID = (req, res, next) => {
 };
 
 exports.getAllReviews = (req, res, next) => {
+  console.log(req.query, "HERE");
   const { sort_by, order, category, limit, p } = req.query;
+  console.log(sort_by, "sort_by");
+  console.log(order, "order");
+  console.log(category, "category");
+  console.log(limit, "limit");
+  console.log(p, "p");
   selectAllReviews(sort_by, order, category, limit, p)
     .then((reviews) => {
       res.status(200).send({ reviews });
@@ -59,9 +65,11 @@ exports.postNewComment = (req, res, next) => {
 
 exports.postNewReview = (req, res, next) => {
   const review = req.body;
+  console.log(review);
   insertReview(review)
     .then((review) => {
       review[0].comment_count = 0;
+      console.log(review[0]);
 
       res.status(201).send(review[0]);
     })

@@ -20,6 +20,7 @@ reviewsRouter
   .get(getAllReviewsByID)
   .patch(updateReviewsByID);
 
-reviewsRouter.route("/").get(getAllReviews).post(postNewReview);
+reviewsRouter.route("/").get(getAllReviews);
+reviewsRouter.route("/").post(postNewReview);
 
 module.exports = reviewsRouter;

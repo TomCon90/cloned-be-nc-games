@@ -356,8 +356,8 @@ describe("testing app():", () => {
           });
         });
         describe("POST", () => {
-          describe.only("POST reviews", () => {
-            test("Status 201: responds with the new review", () => {
+          describe("POST reviews", () => {
+            test.only("Status 201: responds with the new review", () => {
               const newReview = {
                 owner: "mallionaire",
                 title: "This game TESTS my patience!",
